@@ -556,7 +556,7 @@
             const outcome = getOutcome(comp, opp);
             if (!outcome) return;
 
-            const oppTier = oppOwner ? oppOwner.tier : 0; // unranked opponent (not in sweep) treated as neutral
+            const oppTier = oppOwner ? oppOwner.tier : 5; // teams not in the sweep are treated as Tier 5 (below Tier 4)
             const pts = pointsForOutcome(sweepTeam.tier, oppTier, outcome);
 
             const stats = teamStats[sweepTeam.country];
@@ -700,7 +700,7 @@
             const outcome = getOutcome(comp, opp);
             if (!outcome) return;
             const oppOwner = resolveSweepTeam(opp?.team?.displayName);
-            const oppTier = oppOwner ? oppOwner.tier : 0;
+            const oppTier = oppOwner ? oppOwner.tier : 5; // teams not in the sweep are treated as Tier 5 (below Tier 4)
             const pts = pointsForOutcome(owner.tier, oppTier, outcome);
             const verb = outcome === 'W' ? 'won' : outcome === 'D' ? 'drew —' : 'lost —';
             notes.push(`${owner.owner} ${verb} +${pts} pt${pts === 1 ? '' : 's'}`);
