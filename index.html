@@ -729,7 +729,7 @@
       let currentFilter = 'all';
       function renderFixtures() {
         const list = document.getElementById('fixturesList');
-        let events = allEvents;
+        let events = [...allEvents].reverse();
         if (currentFilter !== 'all') {
           events = events.filter(e => getState(e) === currentFilter);
         }
