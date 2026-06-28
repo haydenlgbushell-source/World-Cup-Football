@@ -241,6 +241,12 @@
       .match-teams .vs { color: var(--muted); font-size: 0.75rem; }
       .match-score { font-weight: 800; font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; min-width: 56px; text-align: center; }
       .match-meta { font-size: 0.7rem; color: var(--muted); min-width: 70px; text-align: right; }
+      .owner-tag {
+        font-size: 0.65rem;
+        color: var(--blue-300);
+        margin-left: 4px;
+        opacity: 0.8;
+      }
       .match-note { font-size: 0.7rem; color: var(--red-400); margin-top: 2px; }
 
       .rules-box {
@@ -710,12 +716,15 @@
           if (notes.length) note = `<div class="match-note">${notes.join(' · ')}</div>`;
         }
 
+        const homeLabel = homeOwner ? `<span class="owner-tag">${homeOwner.owner}</span>` : '';
+        const awayLabel = awayOwner ? `<span class="owner-tag">${awayOwner.owner}</span>` : '';
+
         return `
           <div class="match-row">
             <div class="match-teams">
-              ${flag(home?.team?.displayName)}<span>${home?.team?.shortDisplayName || home?.team?.displayName || 'TBD'}</span>
+              ${flag(home?.team?.displayName)}<span>${home?.team?.shortDisplayName || home?.team?.displayName || 'TBD'}</span>${homeLabel}
               <span class="vs">vs</span>
-              ${flag(away?.team?.displayName)}<span>${away?.team?.shortDisplayName || away?.team?.displayName || 'TBD'}</span>
+              ${flag(away?.team?.displayName)}<span>${away?.team?.shortDisplayName || away?.team?.displayName || 'TBD'}</span>${awayLabel}
             </div>
             <div>
               <div class="match-score">${score}</div>
