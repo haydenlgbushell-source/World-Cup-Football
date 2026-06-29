@@ -199,6 +199,10 @@
       .team-pts {
         font-size: 0.7rem; color: var(--blue-300); margin-left: 4px;
       }
+      .team-pill.eliminated {
+        text-decoration: line-through;
+        opacity: 0.45;
+      }
 
       .badge {
         display: inline-block;
@@ -492,6 +496,7 @@
       // ── State ──────────────────────────────────────────────────────────
       let allEvents = [];
       let teamStats = {}; // country -> { points, w, d, l, played }
+      let eliminatedTeams = new Set();
 
       // ── Fetch live data ────────────────────────────────────────────────
       const SCOREBOARD_URL = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260719&limit=200';
@@ -571,6 +576,23 @@
             if (outcome === 'W') stats.w += 1;
             else if (outcome === 'D') stats.d += 1;
             else stats.l += 1;
+          });
+        });
+
+        eliminatedTeams = new Set();
+        allEvents.forEach(event => {
+          if (getState(event) !== 'post') return;
+          const name = (event.name || '').toLowerCase();
+          if (name.includes('group')) return;
+          const competitors = getCompetitors(event);
+          if (competitors.length !== 2) return;
+          competitors.forEach((comp, idx) => {
+            const opp = competitors[1 - idx];
+            const outcome = getOutcome(comp, opp);
+            if (outcome === 'L') {
+              const sweepTeam = resolveSweepTeam(comp?.team?.displayName) || resolveSweepTeam(comp?.team?.name);
+              if (sweepTeam) eliminatedTeams.add(sweepTeam.country);
+            }
           });
         });
       }
@@ -667,7 +689,10 @@
 
       function renderSweep() {
         document.getElementById('sweepBody').innerHTML = Object.entries(SWEEP).map(([owner, teams]) => {
-          const cells = teams.map(country => `<td><span class="team-pill">${flag(country)}${country}</span></td>`).join('');
+          const cells = teams.map(country => {
+            const out = eliminatedTeams.has(country) ? ' eliminated' : '';
+            return `<td><span class="team-pill${out}">${flag(country)}${country}</span></td>`;
+          }).join('');
           return `<tr><td><b>${owner}</b></td>${cells}</tr>`;
         }).join('');
       }
