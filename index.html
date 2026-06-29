@@ -580,20 +580,18 @@
         });
 
         eliminatedTeams = new Set();
+        const teamsWithUpcoming = new Set();
         allEvents.forEach(event => {
-          if (getState(event) !== 'post') return;
-          const name = (event.name || '').toLowerCase();
-          if (name.includes('group')) return;
-          const competitors = getCompetitors(event);
-          if (competitors.length !== 2) return;
-          competitors.forEach((comp, idx) => {
-            const opp = competitors[1 - idx];
-            const outcome = getOutcome(comp, opp);
-            if (outcome === 'L') {
-              const sweepTeam = resolveSweepTeam(comp?.team?.displayName) || resolveSweepTeam(comp?.team?.name);
-              if (sweepTeam) eliminatedTeams.add(sweepTeam.country);
-            }
+          if (getState(event) !== 'pre') return;
+          getCompetitors(event).forEach(comp => {
+            const st = resolveSweepTeam(comp?.team?.displayName) || resolveSweepTeam(comp?.team?.name) || resolveSweepTeam(comp?.team?.shortDisplayName);
+            if (st) teamsWithUpcoming.add(st.country);
           });
+        });
+        Object.keys(TEAM_OWNER).forEach(country => {
+          if (teamStats[country]?.played > 0 && !teamsWithUpcoming.has(country)) {
+            eliminatedTeams.add(country);
+          }
         });
       }
 
